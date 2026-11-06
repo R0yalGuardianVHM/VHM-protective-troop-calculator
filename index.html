@@ -5,13 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Royals Protective March Calculator</title>
     <style>
-        /* Spacing reset to remove white border outline */
-        html, body { margin: 0 !important; padding: 0 !important; width: 100%; height: 100%; background-color: #0f172a; top: 0px !important; }
+        /* Removes the white border line completely */
+        html, body { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            width: 100%; 
+            height: 100%; 
+            background-color: #0f172a; 
+            top: 0px !important; 
+        }
+        
+        /* Premium Built-in Dark Mode Theme */
         .app-bg { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; padding: 16px; min-height: 100vh; box-sizing: border-box; }
         .card { background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         .header-card { text-align: center; border-bottom: 2px solid #1e293b; padding-bottom: 12px; }
         .title { color: #38bdf8; font-size: 20px; font-weight: 800; tracking-spacing: 0.5px; margin: 0; }
         .subtitle { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
+        
+        /* Interactive Interface Controls */
         .input-label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -19,6 +30,8 @@
         .input-field:focus { border-color: #38bdf8; }
         .toggle-btn { width: 100%; background-color: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .toggle-btn.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4); border-color: #2563eb; }
+        
+        /* Output Data Presentation Table Layout */
         .table-container { overflow-x: auto; background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; }
         .table-header { padding: 12px; background-color: #0f172a; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; }
         table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 11px; text-align: left; }
@@ -40,6 +53,7 @@
         <h1 class="title">Royals protective march Calculator</h1>
         <div class="subtitle">Alliance Tactical Deployments</div>
     </header>
+
     <div class="card">
         <div style="margin-bottom: 14px;">
             <label class="input-label">Matrix Setup</label>
@@ -71,6 +85,7 @@
             </div>
         </div>
     </div>
+
     <div class="table-container">
         <div class="table-header">
             <span style="color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">CALCULATED DEPLOYMENT ARCHITECTURE</span>
@@ -92,20 +107,22 @@
         </div>
     </div>
 </div>
+
 <script>
 const db = {
     3: {
         RANGED: [0.35, 0.45, 0.20],
         GROUND: [0.20, 0.45, 0.35],
-        MOUNTED: [0.25, 0.50, 0.25]
+        MOUNTED: [0.30, 0.50, 0.20]
     },
     4: {
         RANGED: [0.15, 0.25, 0.35, 0.25],
         GROUND: [0.25, 0.35, 0.25, 0.15],
-        MOUNTED: [0.20, 0.40, 0.30, 0.10]
+        MOUNTED: [0.20, 0.40, 0.25, 0.15]
     }
 };
 let layers = 3, bias = 'RANGED';
+
 function setMatrix(n) {
     layers = n;
     document.getElementById('m3').className = (n === 3) ? "toggle-btn active" : "toggle-btn";
@@ -120,6 +137,7 @@ function setBias(b) {
     runCalc();
 }
 function fmt(n) { return Math.round(n).toLocaleString('en-GB'); }
+
 function runCalc() {
     const ms = parseFloat(document.getElementById('marchSize').value) || 0;
     const tt = parseInt(document.getElementById('topTier').value) || 15;
@@ -132,27 +150,16 @@ function runCalc() {
     let totalLayersCount = 0;
     for (let t = 1; t <= tt; t++) { if (!fightTiers.includes(t)) totalLayersCount += 4; }
     const remainingMarchSpace = Math.max(0, ms - (totalLayersCount * ls));
+
     for (let t = tt; t >= 1; t--) {
         let isFight = fightTiers.includes(t), rowClass = isFight ? 'row-fight' : 'row-layer';
         let rVal = ls, mVal = ls, gVal = ls, sVal = ls;
         if (isFight) {
             const w = activeWeights[fightTiers.indexOf(t)];
-            if (bias === 'RANGED') {
-                rVal = remainingMarchSpace * w * 0.03;
-                mVal = remainingMarchSpace * w * 0.75;
-                gVal = remainingMarchSpace * w * 0.11;
-                sVal = remainingMarchSpace * w * 0.11;
-            } else if (bias === 'GROUND') {
-                rVal = remainingMarchSpace * w * 0.11;
-                mVal = remainingMarchSpace * w * 0.11;
-                gVal = remainingMarchSpace * w * 0.75;
-                sVal = remainingMarchSpace * w * 0.03;
-            } else if (bias === 'MOUNTED') {
-                rVal = remainingMarchSpace * w * 0.11;
-                mVal = remainingMarchSpace * w * 0.75;
-                gVal = remainingMarchSpace * w * 0.11;
-                sVal = remainingMarchSpace * w * 0.03;
-            }
+            rVal = remainingMarchSpace * w * 0.25;
+            mVal = remainingMarchSpace * w * 0.25;
+            gVal = remainingMarchSpace * w * 0.25;
+            sVal = remainingMarchSpace * w * 0.25;
         }
         html += `<tr class="${rowClass}"><td style="padding-left:12px;" class="tc-tier">T${t}</td><td class="text-right">${fmt(rVal)}</td><td class="text-right">${fmt(mVal)}</td><td class="text-right">${fmt(gVal)}</td><td class="text-right">${fmt(sVal)}</td></tr>`;
     }
