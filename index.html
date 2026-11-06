@@ -1,0 +1,172 @@
+<style>
+    /* Premium Built-in Dark Mode Theme */
+    .app-bg { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; padding: 16px; min-height: 100vh; }
+    .card { background-color: #020617; border: 1px solid #1e293b; rounded-radius: 16px; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+    .header-card { text-align: center; border-bottom: 2px solid #1e293b; padding-bottom: 12px; }
+    .title { color: #38bdf8; font-size: 20px; font-weight: 800; tracking-spacing: 0.5px; margin: 0; }
+    .subtitle { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
+    
+    /* Form Layouts & Inputs */
+    .input-label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; tracking: 0.5px;}
+    .grid-2 { display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .grid-3 { display: grid; grid-template-cols: 1fr 1fr 1fr; gap: 8px; }
+    .input-field { w-full; width: 100%; box-sizing: border-box; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; color: #ffffff; font-family: monospace; font-size: 14px; outline: none; }
+    .input-field:focus { border-color: #38bdf8; }
+    
+    /* Interactive Segment Toggles */
+    .toggle-btn { background-color: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 10px; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .toggle-btn.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4); border-color: #2563eb; }
+    
+    /* Architecture Grid Matrix */
+    .table-container { overflow-x: auto; background-color: #020617; border: 1px solid #1e293b; border-radius: 12px; }
+    .table-header { padding: 12px; background-color: #0f172a; border-b: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 11px; text-align: left; }
+    th { background-color: #0f172a; color: #94a3b8; padding: 10px; border-bottom: 1px solid #1e293b; text-transform: uppercase; font-size: 10px; }
+    td { padding: 10px; border-bottom: 1px solid #0f172a; }
+    .row-fight { background-color: rgba(37, 99, 235, 0.08); color: #f8fafc; font-weight: bold; }
+    .row-layer { color: #64748b; }
+    .text-right { text-align: right; }
+    
+    /* Custom Colors per Variant */
+    .tc-tier { color: #94a3b8; font-weight: bold; }
+    .tc-ranged { color: #38bdf8; }
+    .tc-mounted { color: #f59e0b; }
+    .tc-ground { color: #34d399; }
+    .tc-siege { color: #c084fc; }
+</style>
+
+<div class="app-bg">
+    <!-- Header Block -->
+    <header class="card header-card">
+        <h1 class="title">Royals protective march Calculator</h1>
+        <div class="subtitle">Alliance Tactical Deployments</div>
+    </header>
+
+    <!-- Controls Input Interface Box -->
+    <div class="card" style="space-y: 16px;">
+        <div style="margin-bottom: 14px;">
+            <label class="input-label">Matrix Setup</label>
+            <div class="grid-2">
+                <button onclick="setMatrix(3)" id="m3" class="toggle-btn active">3-Tier Matrix</button>
+                <button onclick="setMatrix(4)" id="m4" class="toggle-btn">4-Tier Matrix</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+            <label class="input-label">Troop Bias Type</label>
+            <div class="grid-3">
+                <button onclick="setBias('RANGED')" id="bR" class="toggle-btn active">Ranged</button>
+                <button onclick="setBias('GROUND')" id="bG" class="toggle-btn">Ground</button>
+                <button onclick="setBias('MOUNTED')" id="bM" class="toggle-btn">Mounted</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 6px;">
+            <label class="input-label">Total March Size</label>
+            <input type="number" id="marchSize" value="9000000" oninput="runCalc()" class="input-field" style="font-size: 16px; font-weight: bold; color: #38bdf8;">
+        </div>
+
+        <div class="grid-2" style="margin-top: 12px; margin-bottom: 0;">
+            <div>
+                <label class="input-label">Top Tier</label>
+                <input type="number" id="topTier" value="15" min="5" max="25" oninput="runCalc()" class="input-field">
+            </div>
+            <div>
+                <label class="input-label">Layer Size</label>
+                <input type="number" id="layerSize" value="10000" oninput="runCalc()" class="input-field">
+            </div>
+        </div>
+    </div>
+
+    <!-- Output Metrics Grid Visualizer -->
+    <div class="table-container">
+        <div class="table-header">
+            <span style="color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">CALCULATED DEPLOYMENT ARCHITECTURE</span>
+            <span id="ratioInfo" style="color: #38bdf8; font-family: monospace;">35% / 45% / 20%</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="padding-left: 12px;">Tier</th>
+                        <th class="text-right tc-ranged">Ranged</th>
+                        <th class="text-right tc-mounted">Mount</th>
+                        <th class="text-right tc-ground">Ground</th>
+                        <th class="text-right tc-siege">Siege</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixDisplay">
+                    <!-- Javascript populates data values smoothly -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const db = {
+    3: {
+        RANGED:  { w: [0.2, 0.3, 0.5], m: { R: 0.8, M: 0.1, G: 0.05, S: 0.05 } },
+        GROUND:  { w: [0.5, 0.3, 0.2], m: { R: 0.05, M: 0.025, G: 0.4, S: 0.025 } },
+        MOUNTED: { w: [0.35, 0.45, 0.2], m: { R: 0.1, M: 0.8, G: 0.05, S: 0.05 } }
+    },
+    4: {
+        RANGED:  { w: [0.1, 0.2, 0.3, 0.4], m: { R: 0.8, M: 0.1, G: 0.05, S: 0.05 } },
+        GROUND:  { w: [0.4, 0.3, 0.2, 0.1], m: { R: 0.1, M: 0.05, G: 0.8, S: 0.05 } },
+        MOUNTED: { w: [0.25, 0.45, 0.2, 0.1], m: { R: 0.1, M: 0.8, G: 0.05, S: 0.05 } }
+    }
+};
+
+let layers = 3, bias = 'MOUNTED';
+
+function setMatrix(n) {
+    layers = n;
+    document.getElementById('m3').className = n===3 ? "toggle-btn active" : "toggle-btn";
+    document.getElementById('m4').className = n===4 ? "toggle-btn active" : "toggle-btn";
+    runCalc();
+}
+
+function setBias(b) {
+    bias = b;
+    ['R', 'G', 'M'].forEach(k => {
+        let id = 'b' + k;
+        let profileKey = k === 'R' ? 'RANGED' : (k === 'G' ? 'GROUND' : 'MOUNTED');
+        document.getElementById(id).className = b === profileKey ? "toggle-btn active" : "toggle-btn";
+    });
+    runCalc();
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('en-GB'); }
+
+function runCalc() {
+    const ms = parseFloat(document.getElementById('marchSize').value)||0;
+    const tt = parseInt(document.getElementById('topTier').value)||15;
+    const ls = parseFloat(document.getElementById('layerSize').value)||0;
+    
+    const data = db[layers][bias];
+    document.getElementById('ratioInfo').innerText = data.w.map(x => (x*100)+'%').join(' / ');
+
+    const lowFight = tt - layers + 1;
+    const uniLayers = Math.max(0, lowFight - 1);
+    const netFight = Math.max(0, ms - (uniLayers * ls * 4));
+
+    let html = '';
+    for(let i=tt; i>=1; i--) {
+        let r=ls, m=ls, g=ls, s=ls, isF = (i >= lowFight && i <= tt);
+        if(isF) {
+            let segment = netFight * data.w[tt - i];
+            r = segment * data.m.R; m = segment * data.m.M; g = segment * data.m.G; s = segment * data.m.S;
+        }
+        html += `<tr class="${isF ? 'row-fight' : 'row-layer'}">
+            <td style="padding-left: 12px;" class="tc-tier">T${i}</td>
+            <td class="text-right tc-ranged">${fmt(r)}</td>
+            <td class="text-right tc-mounted">${fmt(m)}</td>
+            <td class="text-right tc-ground">${fmt(g)}</td>
+            <td class="text-right tc-siege">${fmt(s)}</td>
+        </tr>`;
+    }
+    document.getElementById('matrixDisplay').innerHTML = html;
+}
+
+setTimeout(runCalc, 200);
+</script>
